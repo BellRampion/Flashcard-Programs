@@ -57,21 +57,20 @@ int fill(char s2[]){
 	FILE *fp;
 	fp = fopen("theorems", "r");
 	
-	while ((c = fgetc(fp)) != ';' ){
-		s2[i] = c;
-		++i;
+	while ((c = fgetc(fp)) != ';' ){ //Reads one character at a time from "theorems" until it reaches a ';'
+		s2[i] = c; //Puts the character in an array
+		++i; 
 	}
-	s2[i] = '\0';
-	printf ("%s\n", s2);
+	s2[i] = '\0'; //End the string
+	printf ("%s\n", s2); //Print the string
 		
 }
 
-int compare(char s1[], char s2[]){ 
-	int i, correct, k, incorrect, m;
+int compare(char s1[], char s2[]){ //Compare the user input and the actual theorem
+	int i, correct, k, incorrect;
 	incorrect = 0;
 	k = 0;
 	correct = 0;
-	m = 0;
 	for (i = 0; s1[i] != '\0'; i++){ //i starts out at 0. Test to see if the end of 's1' has been reached.
 //		printf("i: %i\n", i); // Print the value of i, which is the place it's at in 's1'. For error checking.  
 		if (s1[i] != s2[k])//If the current character in 's1' is not equal to the current character in 's2',
