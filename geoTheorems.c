@@ -73,7 +73,7 @@ int compare(char s1[], char s2[]){
 	correct = 0;
 	m = 0;
 	for (i = 0; s1[i] != '\0'; i++){ //i starts out at 0. Test to see if the end of 's1' has been reached.
-		printf("i: %i\n", i); // Print the value of i, which is the place it's at in 's1'. 
+//		printf("i: %i\n", i); // Print the value of i, which is the place it's at in 's1'. For error checking.  
 		if (s1[i] != s2[k])//If the current character in 's1' is not equal to the current character in 's2',
 		{
 			++incorrect; //Add one to incorrect
@@ -87,7 +87,7 @@ int compare(char s1[], char s2[]){
 			
 	}
 	printf("The theorem/postulate/corollary: %s \n", s2);
-	if (incorrect > 5)
+	if (incorrect > 5) //Don't count it wrong unless there are more than five letters wrong.
 	{
 		printf("Incorrect. You got %i letters wrong. \n", incorrect);
 		return 1;
@@ -99,7 +99,7 @@ int compare(char s1[], char s2[]){
 	}	
 }
 
-int bgetline(char s1[]){
+int bgetline(char s1[]){ //Takes the user's input and puts it in an array
 	int c;
 	int i;
 	
