@@ -1,9 +1,9 @@
 #include <stdio.h>
 /*WHAT STILL NEEDS TO BE DONE:
-	1. Write fill to take a line from theorems.h ending with a ; and fill an array with it. 
+	1. Change fill() to start from the last place it read from and read the next line. 
 	2. DONE Change compare to not test the current letter in 's1' against every letter in 's2'. 
-	3. Copy the rest of the theorems and corollaries to theorems.h.
-	4. Add the postulates to theorems.h */
+	3. Copy the rest of the theorems and corollaries to theorems.
+	4. Add the postulates to theorems.*/
 
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
 
