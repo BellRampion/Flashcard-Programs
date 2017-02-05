@@ -1,13 +1,13 @@
 #include <stdio.h>
 /*WHAT STILL NEEDS TO BE DONE:
-	1. Fix typos in theorems.
-	2. Add a variable to show how many cards the user has already done and how many are left
+	1. DONE Fix typos in theorems.
+	2. DONE Add a variable to show how many cards the user has already done and how many are left
 	3. Copy the rest of the theorems and corollaries to theorems.
 	4. Add the postulates to theorems.*/
 
 /*TO UPLOAD TO GITHUB: 
 	Copy file to cPrograms. Run this code: 
-	"git add changedfile.c
+	"git add geotheorems.c
 	git commit -m "Commit message"
 	git push" */
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
@@ -24,14 +24,27 @@ int main()
 	char s1[MAXLENGTH]; //Character array to hold user's input
 	char s2[MAXLENGTH]; //Character array to hold text to compare input to
 	char nl; //For catching newlines
+	char yOrN; //Yes or no
 	int i, j;  
-	int getTheorem = 1; //
+	int getTheorem = 1; 
 	int compareThem = 0;
 	int override = 0;
 	int correct, incorrect;
+	int numDone, printNum; //Number of cards done and number of cards left in deck
+	numDone = printNum = 0;
 	correct = incorrect = 0;
 	FILE *fp;
 	fp = fopen("theorems", "r"); //This is done here so that fill() won't reopen it each time. 
+	/*Option to print the place the user is in the deck*/
+	printf("Would you like to have the number of cards completed and the number left printed after each card? (y/n):\n");
+	yOrN = getchar();
+	nl = getchar();
+	
+	if (yOrN == 'y')
+	{
+		printNum = 1;
+	}
+	else printNum = 0;
 	
 	printf("When prompted, type in the theorems and postulates from Jacob's Geometry: first theorems with their corollaries, then the postulates. The theorem/postulate/corollary that you should type will be printed after you have entered your input. If the program did not compare it correctly, you may override the program. \n");
 	
@@ -60,7 +73,13 @@ int main()
 				printf("No override.\n");
 			}	
 		}
-		printf("Next card.\n");
+		
+		if (printNum == 1)
+		{
+			++numDone;
+			printf("You have completed %i cards. There are %i cards left in the deck.\n", numDone, NUMTHEOREMS-numDone);
+		}
+		
 	}
 }
 
