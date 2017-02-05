@@ -6,10 +6,11 @@
 	4. Add the postulates to theorems.*/
 
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
+#define NUMTHEOREMS 20 //The number of theorems/postulates/corollaries in theorems
 
 
 /*Functions*/
-int fill(char s2[]);
+int fill(char s2[], FILE *fp);
 int compare(char s1[], char s2[]);
 int bgetline(char s1[]);
 
@@ -17,51 +18,55 @@ int main()
 {
 	char s1[MAXLENGTH]; //Character array to hold user's input
 	char s2[MAXLENGTH]; //Character array to hold text to compare input to
-	int i;  
+	char nl; //For catching newlines
+	int i, j;  
 	int getTheorem = 1; //
 	int compareThem = 0;
 	int override = 0;
 	int correct, incorrect;
 	correct = incorrect = 0;
+	FILE *fp;
+	fp = fopen("theorems", "r"); //This is done here so that fill() won't reopen it each time. 
 	
-	i = fill(s2);
 	printf("When prompted, type in the theorems and postulates from Jacob's Geometry in order that they appear in the book. The theorem/postulate/corollary that you should type will be printed after you have entered your input. If the program did not compare it correctly, you may override the program. \n");
-	printf("Begin: \n");
-	getTheorem = bgetline(s1);
+	
+	for (i = 0; i < NUMTHEOREMS - 1; ++i){
+		j = fill(s2, fp);
+		printf("Begin: \n");
+		getTheorem = bgetline(s1);
 
-	printf("Comparing...\n");
-	compareThem = compare(s1, s2);
-	if (compareThem == 1)
-	{
-		printf("Would you like to override? (y/n) \n");
-		override = getchar();
-		
-		/*Lets you override the program if you think you got close enough */
-		if (override == 'y') 
+		printf("Comparing...\n");
+		compareThem = compare(s1, s2);
+		if (compareThem == 1)
 		{
-			++correct;
-			printf("Override successful.\n");
+			printf("Would you like to override? (y/n) \n");
+			override = getchar();
+			nl = getchar();
+			
+			/*Lets you override the program if you think you got close enough */
+			if (override == 'y') 
+			{
+				++correct;
+				printf("Override successful.\n");
+			}
+			else 
+			{
+				++incorrect;
+				printf("No override.\n");
+			}	
 		}
-		else 
-		{
-			++incorrect;
-			printf("No override.\n");
-		}	
+		printf("Next card.\n");
 	}
 }
 
-int fill(char s2[]){
-	int i;
+int fill(char s2[], FILE *fp){
+	int i, max;
 	char c;
 	i = 0;
-	FILE *fp;
-	fp = fopen("theorems", "r");
+	max = MAXLENGTH;
 	
-	while ((c = fgetc(fp)) != ';' ){ //Reads one character at a time from "theorems" until it reaches a ';'
-		s2[i] = c; //Puts the character in an array
-		++i; 
-	}
-	s2[i] = '\0'; //End the string
+	fgets(s2, max, fp); //Reads a line from theorems
+	
 	printf ("%s\n", s2); //Print the string
 		
 }
@@ -85,7 +90,7 @@ int compare(char s1[], char s2[]){ //Compare the user input and the actual theor
 		}
 			
 	}
-	printf("The theorem/postulate/corollary: %s \n", s2);
+//	printf("The theorem/postulate/corollary: %s \n", s2);
 	if (incorrect > 5) //Don't count it wrong unless there are more than five letters wrong.
 	{
 		printf("Incorrect. You got %i letters wrong. \n", incorrect);
