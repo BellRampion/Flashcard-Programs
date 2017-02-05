@@ -1,12 +1,17 @@
 #include <stdio.h>
 /*WHAT STILL NEEDS TO BE DONE:
-	1. Change fill() to start from the last place it read from and read the next line. 
-	2. DONE Change compare to not test the current letter in 's1' against every letter in 's2'. 
+	1. Fix typos in theorems.
+	2. Add a variable to show how many cards the user has already done and how many are left
 	3. Copy the rest of the theorems and corollaries to theorems.
 	4. Add the postulates to theorems.*/
 
+/*TO UPLOAD TO GITHUB: 
+	Copy file to cPrograms. Run this code: 
+	"git add changedfile.c
+	git commit -m "Commit message"
+	git push" */
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
-#define NUMTHEOREMS 20 //The number of theorems/postulates/corollaries in theorems
+#define NUMTHEOREMS 58 //The number of lines in theorems
 
 
 /*Functions*/
@@ -28,7 +33,7 @@ int main()
 	FILE *fp;
 	fp = fopen("theorems", "r"); //This is done here so that fill() won't reopen it each time. 
 	
-	printf("When prompted, type in the theorems and postulates from Jacob's Geometry in order that they appear in the book. The theorem/postulate/corollary that you should type will be printed after you have entered your input. If the program did not compare it correctly, you may override the program. \n");
+	printf("When prompted, type in the theorems and postulates from Jacob's Geometry: first theorems with their corollaries, then the postulates. The theorem/postulate/corollary that you should type will be printed after you have entered your input. If the program did not compare it correctly, you may override the program. \n");
 	
 	for (i = 0; i < NUMTHEOREMS - 1; ++i){
 		j = fill(s2, fp);
@@ -59,7 +64,7 @@ int main()
 	}
 }
 
-int fill(char s2[], FILE *fp){
+int fill(char s2[], FILE *fp){ //Fills an array from a file
 	int i, max;
 	char c;
 	i = 0;
@@ -68,6 +73,7 @@ int fill(char s2[], FILE *fp){
 	fgets(s2, max, fp); //Reads a line from theorems
 	
 	printf ("%s\n", s2); //Print the string
+	return 0;
 		
 }
 
