@@ -7,12 +7,12 @@
 
 /*TO UPLOAD TO GITHUB: 
 	Copy file to cPrograms. Run this code: 
-	"git add geotheorems.c
+	"git add geoTheorems.c
 	git commit -m "Commit message"
 	git push" */
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
 #define NUMTHEOREMS 58 //The number of lines in theorems
-
+#define FILENAME "theorems"
 
 /*Functions*/
 int fill(char s2[], FILE *fp);
@@ -34,7 +34,7 @@ int main()
 	numDone = printNum = 0;
 	correct = incorrect = 0;
 	FILE *fp;
-	fp = fopen("theorems", "r"); //This is done here so that fill() won't reopen it each time. 
+	fp = fopen(FILENAME, "r"); //This is done here so that fill() won't reopen it each time. 
 	/*Option to print the place the user is in the deck*/
 	printf("Would you like to have the number of cards completed and the number left printed after each card? (y/n):\n");
 	yOrN = getchar();
@@ -89,9 +89,17 @@ int fill(char s2[], FILE *fp){ //Fills an array from a file
 	i = 0;
 	max = MAXLENGTH;
 	
-	fgets(s2, max, fp); //Reads a line from theorems
+	fgets(s2, max, fp); //Reads a line from the file
 	
-	printf ("%s\n", s2); //Print the string
+	for (i = 0; i < 19; ++i){
+		printf("%c", s2[i]);
+	}
+	if (s2[i] != 32)
+	{
+		for (i = i; s2[i] != 32; ++i)
+			printf("%c", s2[i]);
+	}
+	printf("\n");
 	return 0;
 		
 }
@@ -119,6 +127,7 @@ int compare(char s1[], char s2[]){ //Compare the user input and the actual theor
 	if (incorrect > 5) //Don't count it wrong unless there are more than five letters wrong.
 	{
 		printf("Incorrect. You got %i letters wrong. \n", incorrect);
+		printf("%s\n", s2):
 		return 1;
 	}
 	else 
