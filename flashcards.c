@@ -1,15 +1,5 @@
 #include <stdio.h>
-/*WHAT STILL NEEDS TO BE DONE:
-	1. DONE Change color, printNum, and sepFile to be global variables. Otherwise their values don't hold across functions.
-	2. Add an option for displaying part of the line or reading the title from a file
-	3. Fix the color so that it actually has an option to turn it off. Currently, the colors are always defined. 
-	4. Design a nice welcome screen and an options screen.*/
 
-/*TO UPLOAD TO GITHUB:
-	Copy file to cPrograms. Run this code:
-	"git add geoTheorems.c
-	git commit -m "Commit message"
-	git push" */
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
 
 /*Functions*/
