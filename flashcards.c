@@ -1,9 +1,24 @@
 #include <stdio.h>
 
 #define MAXLENGTH 1000 // MAXLENGTH stands for 1,000
+#define NUMCARDS numCards //The number of lines in the file for the cards.
+//Defines the colors in ANSI escape codes
+#define KNRM  "\x1B[0m" //Default
+#define KRED  "\x1B[31m" //Red
+#define KGRN  "\x1B[32m" //Green
+#define KYEL  "\x1B[33m" //Yellow/orange
+#define KBLU  "\x1B[34m" //Blue
+#define KMAG  "\x1B[35m" //Purple
+#define KCYN  "\x1B[36m" //Light/bright blue
+#define KWHT  "\x1B[37m" //White
+#define FILENAME name //Replaces FILENAME with the contents of array "name"
+#define FILENAME2 name2 //For the second filename
+//A #define for debugging that takes the argument and prints its value with an expression before it
+#define debugging(expr, x) (debug == 1) ? printf(#expr " %i\n", x) : x; 
+
 
 /*Functions*/
-int fill(char card[], FILE *fp, int sepFile);
+int fill(char card[], FILE *fp);
 int compare(char ans[], char card[]);
 int bgetline(char s[], int putNl);
 int options(void);
@@ -15,7 +30,8 @@ int sepFile = 0;//For reading from a separate file to get the card text, or usin
 int printNum = 1; //Whether or not to print numDone
 int color; //For colored or not colored text
 int numCards = 1;
-int numSets = 1;
+int debug = 0;
+
 
 int main()
 {
@@ -23,9 +39,14 @@ int main()
 	char ans[MAXLENGTH]; //Character array to hold user's input
 	char card[MAXLENGTH]; //Character array to hold text to compare input to
 	char name[MAXLENGTH]; //Character array to hold filename
+	char name2[MAXLENGTH]; //Char array for the second filename
 	char cardSets[MAXLENGTH]; //Character array to hold names of card sets
+	char fileLine[MAXLENGTH];
+	char hint[MAXLENGTH]; //For the hint to be printed for each card
+	char s[MAXLENGTH]; //For "read hint from card" code (stores length of answer to be gotten)
 	char nl; //For catching newlines
 	char yOrN; //Yes or no
+	char c; 
 
 	//ints
 	int i, j, k;
@@ -37,14 +58,19 @@ int main()
 	int call; //For calling functions
 	int putNl; //For telling bgetline not to add a nl to the array
 	int max;
-	int sepFile;
-
+	
 	//FILEs
 	FILE *fp; //A pointer to use in opening the file
+	FILE *fp2; //A second pointer for files
 
 	max = MAXLENGTH;
 	numDone = 0;
 	correct = incorrect = 0;
+	
+	printf("Would you like to turn debugging mode on? (y/n) [n]: ");
+	c = getchar();
+	debug = (c == 'y') ? 1 : 0;
+	nl = getchar();
 
 
 	printf("Would you like to change any options? (y/n): ");
@@ -54,36 +80,21 @@ int main()
 	if (yOrN == 'y')
 	{
 		call = options();
-	}
-
-	if (color == 1)
+	}	
+	
+	if (sepFile == 0)
 	{
-		//Defines the colors in ANSI escape codes
-		#define KNRM  "\x1B[0m" //Default
-		#define KRED  "\x1B[31m" //Red
-		#define KGRN  "\x1B[32m" //Green
-		#define KYEL  "\x1B[33m" //Yellow/orange
-		#define KBLU  "\x1B[34m" //Blue
-		#define KMAG  "\x1B[35m" //Purple
-		#define KCYN  "\x1B[36m" //Light/bright blue
-		#define KWHT  "\x1B[37m" //White
+		printf("How much of the answer for each card do you want read for the card text? ");
+		for (i = 0; i<MAXLENGTH-1 && (k=getchar()) !='$' && k !='\n'; ++i )
+			s[i] = k;
+
+		nl = k;
+		s[i] = '\0';
+
+		for (i = 0; s[i] >= '0' && s[i] <= '9'; ++i) //Code copied from aToI that converts from array to int
+			line = 10 * line + (s[i] - '0');
+		debugging(Amount ,line);
 	}
-
-	char fileLine[MAXLENGTH];
-
-	fp = fopen("cardSets", "r"); //This is done here so that fill() won't reopen the file each time.
-	numSets = 0;
-
-	for (i = 0; fileLine[0] != '$' && i<MAXLENGTH-1; i++)
-	{
-		fgets(fileLine, max, fp); //Reads a line from the file
-		++numSets;
-
-	}
-	printf("Number of cards: %i.\n", numCards);
-	fclose(fp);
-
-	#define NUMSETS numSets
 
 	putNl = 0;
 	printf("Would you like a list of the card sets available? (y/n): ");
@@ -93,34 +104,60 @@ int main()
 	if (yOrN == 'y')
 	{
 		fp = fopen("cardSets", "r");
-		for (i = 0; i < NUMSETS; i++){
-			fgets(cardSets, max, fp); //Reads a line from the file
-			printf("Set %i: %s\n", i+1, cardSets);
+		for (i = 1; fgets(cardSets, max, fp) != NULL; i++){ //Starts at line 1; checks to see if the return after pulling a line from the file is NULL; increases the line number
+			printf("Set %i: %s\n", i, cardSets);
 		}
 		printf("\n");
 	}
 
-	printf("Enter the name of the file you would like to open: ");
+	printf("Enter the name of the card set for the answers: ");
 	call = bgetline(name, putNl);
-	printf("\nFilename: %s\n", name);
+	//printf("\nFilename: %s\n", name);
 	putNl = 1;
-	#define FILENAME name //Replaces FILENAME with the contents of array "name"
+	
 
 	call = info(max, fp, name);
-	#define NUMCARDS numCards //The number of lines in the file for the cards.
+	
 
 	fp = fopen(FILENAME, "r"); //This is done here so that fill() won't reopen the file each time. It must be reopened after info, because info closes it.
+	if (sepFile == 1)
+	{
+		printf("Enter the name of the card set for the hints: ");
+		putNl = 0;
+		call = bgetline(name2, putNl);
+		putNl = 1; 
+		fp2 = fopen(name2, "r"); //Open the file for hints
+	}
 
 	printf("This is a flashcard program. \n\n");
-	printf("Line: %i\n", line);
-	printf("numCards: %i\n", numCards);
+	//printf("numCards: %i\n", numCards);
+	//printf("NUMCARDS: %i\n", NUMCARDS);
 
-	for (i = 0; i < NUMCARDS-1; ++i){
-	/*	for (k = 0; k < 25; k++)
-			printf("\n"); */
-
-		j = fill(card, fp, sepFile);
-		printf("Begin: \n");
+	for (i = 0; i < NUMCARDS; ++i){
+		
+		j = fill(card, fp);
+		
+		if (sepFile == 0)
+		{
+			for (j = 0; j < line; ++j){
+				printf("%c", card[j]);
+			}
+			if (card[j] != 32)
+			{
+				for (j = j; card[j] != 32; ++j)
+					printf("%c", card[j]);
+			}
+			printf("\n");
+		}
+		else 
+		{
+			j = fill(hint, fp2);
+			for (j = 0; j < MAXLENGTH && hint[j] != '\n'; j++){
+				printf("%c", hint[j]);
+			}
+			printf(" ");
+		}
+		//printf("Begin: \n");
 		getTheorem = bgetline(ans, putNl);
 
 		printf("Comparing...\n");
@@ -147,15 +184,15 @@ int main()
 		if (printNum == 1)
 		{
 			++numDone;
-			printf("You have completed %i cards. There are %i cards left in the deck.\n", numDone, (NUMCARDS-1)-numDone);
+			printf("You have completed %i cards. There are %i cards left in the deck.\n", numDone, NUMCARDS-numDone);
 		}
-
 	}
+	return 0;
 }
 
 /****Fills an array from a file****/
 
-int fill(char card[], FILE *fp, int sepFile){
+int fill(char card[], FILE *fp){
 	int i, max;
 	char c;
 	i = 0;
@@ -164,16 +201,8 @@ int fill(char card[], FILE *fp, int sepFile){
 	fgets(card, max, fp); //Reads a line from the file
 
 	printf("________________________________________________________________________________\n\n");
-	printf("Line: %i\n\n", line);
-	for (i = 0; i < line; ++i){
-		printf("%c", card[i]);
-	}
-	if (card[i] != 32)
-	{
-		for (i = i; card[i] != 32; ++i)
-			printf("%c", card[i]);
-	}
-	printf("\n");
+	//printf("Line: %i\n\n", line);
+	
 	return 0;
 
 }
@@ -199,15 +228,43 @@ int compare(char ans[], char card[]){
 		}
 
 	}
+	for (k = 0; card[k] != '\0'; k++)
+		;
+	debugging(Length of card text:, k);
+	debugging(Length of answer:, i);
+	if (k > i) //If the card text is longer than the answer, increase incorrect enough to make sure it goes over the test limit
+	{
+		incorrect += 6;
+	}
+	
+	if (k < i)
+	{
+		incorrect += 6; //If the card text is shorter than the answer, it's still wrong
+	}
+	
 	if (incorrect > 5) //Don't count it wrong unless there are more than five letters wrong.
 	{
-		printf(KRED "Incorrect. You got %i letters wrong. \n\n\n" KNRM, incorrect);
-		printf("%s\n", card); //Print what should have been entered, so that the user can check it.
+		if (color == 1)
+		{
+			printf(KRED "Incorrect. You got %i letters wrong. \n\n\n" KNRM, incorrect);
+			printf("%s\n", card); //Print what should have been entered, so that the user can check it.
+		}
+		else printf("Incorrect. You got %i letters wrong. \n\n\n", incorrect);
 		return 1;
 	}
 	else
 	{
-		printf(KYEL "Correct! You got %i letters right and %i letters wrong. \n\n\n" KNRM, correct, incorrect);
+		if (color == 1)
+		{
+			printf(KYEL "Correct! You got %i letters right and %i letters wrong. \n\n\n" KNRM, correct, incorrect);
+			incorrect > 0 ? printf("%s\n", card) : i;
+		}
+		else
+		{
+			printf("Correct! You got %i letters right and %i letters wrong. \n\n\n", correct, incorrect);
+			incorrect > 0 ? printf("%s\n", card) : i;
+		}
+		
 		return 0;
 	}
 }
@@ -234,10 +291,8 @@ int bgetline(char s[], int putNl){
 /*Lets the user set options*/
 int options(void){
   char yOrN;
-	char s[MAXLENGTH];
 	int nl;
 	int i;
-	int c;
 	int changeOption;
 	int n;
 	n = 0;
@@ -258,7 +313,7 @@ int options(void){
 		{
 			printf("2. Print number of cards left in deck after each card (disabled)\n");
 		}
-	if (sepFile == 1)
+	if (sepFile == 0)
 		{
 
 			printf("3. Read text for cards as part of the answer (instead of reading the text from a separate file).\n");
@@ -316,15 +371,15 @@ int options(void){
 		/*Where to get the card text from*/
 		else if (changeOption == 3)
 		{
-			if (sepFile == 1)
+			if (sepFile == 0)
 			{
-				sepFile = 0;
+				sepFile = 1;
 				printf("Read text for cards from a separate file (instead of giving part of the answer as a hint).\n");
 
 			}
 			else
 			{
-				sepFile = 1;
+				sepFile = 0;
 				printf("Read text for cards as part of the answer (instead of reading the text from a separate file).\n");
 			}
 		}
@@ -354,7 +409,7 @@ int options(void){
 			{
 				printf("2. Print number of cards left in deck after each card (disabled)\n");
 			}
-		if (sepFile == 1)
+		if (sepFile == 0)
 			{
 				printf("3. Read text for cards as part of the answer (instead of reading the text from a separate file).\n\n");
 			}
@@ -363,19 +418,7 @@ int options(void){
 				printf("3. Read text for cards from a separate file (instead of giving part of the answer as a hint).\n\n");
 			}
 	}
-	if (sepFile == 1)
-	{
-		printf("How much of the answer for each card do you want read for the card text? ");
-		for (i = 0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i )
-			s[i] = c;
-
-		nl = c;
-		s[i] = '\0';
-
-		for (i = 0; s[i] >= '0' && s[i] <= '9'; ++i) //Code copied from aToI that converts from array to int
-			line = 10 * line + (s[i] - '0');
-		printf("%i letters of the answer.\n\n", line);
-	}
+	
   return 0;
 }
 
@@ -384,16 +427,15 @@ int info(int max, FILE *fp, char name[]){
 	int i;
 	char fileLine[MAXLENGTH];
 
-	fp = fopen(FILENAME, "r"); //This is done here so that fill() won't reopen the file each time.
+	fp = fopen(FILENAME, "r"); 
 	numCards = 0;
 
-	for (i = 0; fileLine[0] != '$' && i<MAXLENGTH-1; i++)
+	for (i = 0; fgets(fileLine, max, fp) != NULL && i<MAXLENGTH-1; i++)
 	{
-		fgets(fileLine, max, fp); //Reads a line from the file
 		++numCards;
 
 	}
-	printf("Number of cards: %i.\n", numCards);
+	debugging(Number of cards, numCards);
 	fclose(fp);
 
 	return 0;
