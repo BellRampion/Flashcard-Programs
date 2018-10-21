@@ -155,9 +155,9 @@ int main()
 			for (j = 0; j < MAXLENGTH && hint[j] != '\n'; j++){
 				printf("%c", hint[j]);
 			}
-			printf(" ");
+			printf("\n");
 		}
-		//printf("Begin: \n");
+		
 		getTheorem = bgetline(ans, putNl);
 
 		printf("Comparing...\n");
