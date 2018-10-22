@@ -50,6 +50,7 @@ int main()
 
 	//ints
 	int i, j, k;
+	int cardCount = 0; 
 	int getTheorem = 1;
 	int compareThem = 0;
 	int override = 0;
@@ -70,7 +71,7 @@ int main()
 	printf("Would you like to turn debugging mode on? (y/n) [n]: ");
 	c = getchar();
 	debug = (c == 'y') ? 1 : 0;
-	nl = getchar();
+	nl = (c != '\n') ? getchar() : 0;
 
 
 	printf("Would you like to change any options? (y/n): ");
@@ -130,10 +131,8 @@ int main()
 	}
 
 	printf("This is a flashcard program. \n\n");
-	//printf("numCards: %i\n", numCards);
-	//printf("NUMCARDS: %i\n", NUMCARDS);
 
-	for (i = 0; i < NUMCARDS; ++i){
+	for (cardCount = 0; cardCount < NUMCARDS; ++cardCount){
 		
 		j = fill(card, fp);
 		
@@ -180,13 +179,15 @@ int main()
 				printf("No override.\n");
 			}
 		}
+		else ++correct;
 
 		if (printNum == 1)
 		{
 			++numDone;
-			printf("You have completed %i cards. There are %i cards left in the deck.\n", numDone, NUMCARDS-numDone);
+			printf("You have completed %i card%s. There are %i card%s left in the deck.\n", numDone, (numDone > 1) ? 's' : '', NUMCARDS-numDone);
 		}
 	}
+	printf("You got %i cards correct and %i cards incorrect.\n", correct, incorrect);
 	return 0;
 }
 
@@ -232,36 +233,36 @@ int compare(char ans[], char card[]){
 		;
 	debugging(Length of card text:, k);
 	debugging(Length of answer:, i);
-	if (k > i) //If the card text is longer than the answer, increase incorrect enough to make sure it goes over the test limit
+	if (k > i) //If the card text is longer than the answer, it's wrong
 	{
-		incorrect += 6;
+		incorrect += 1;
 	}
 	
 	if (k < i)
 	{
-		incorrect += 6; //If the card text is shorter than the answer, it's still wrong
+		incorrect += 1; //If the card text is shorter than the answer, it's still wrong
 	}
 	
-	if (incorrect > 5) //Don't count it wrong unless there are more than five letters wrong.
+	if (incorrect > 0) //If any letters are wrong, count it wrong.
 	{
 		if (color == 1)
 		{
-			printf(KRED "Incorrect. You got %i letters wrong. \n\n\n" KNRM, incorrect);
+			printf(KRED "Incorrect.\n\n\n" KNRM);
 			printf("%s\n", card); //Print what should have been entered, so that the user can check it.
 		}
-		else printf("Incorrect. You got %i letters wrong. \n\n\n", incorrect);
+		else printf("Incorrect.\n\n\n");
 		return 1;
 	}
 	else
 	{
 		if (color == 1)
 		{
-			printf(KYEL "Correct! You got %i letters right and %i letters wrong. \n\n\n" KNRM, correct, incorrect);
+			printf(KYEL "Correct!\n\n\n" KNRM);
 			incorrect > 0 ? printf("%s\n", card) : i;
 		}
 		else
 		{
-			printf("Correct! You got %i letters right and %i letters wrong. \n\n\n", correct, incorrect);
+			printf("Correct!\n\n\n");
 			incorrect > 0 ? printf("%s\n", card) : i;
 		}
 		
